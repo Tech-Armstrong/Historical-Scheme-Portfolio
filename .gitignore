@@ -1,0 +1,89 @@
+# =========================================================
+# Secrets & credentials — NEVER commit these
+# =========================================================
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+credentials*.json
+service_account*.json
+secrets*.json
+*.secret
+neo4j.conf
+
+# =========================================================
+# Python virtual environments (root and nested)
+# =========================================================
+venv/
+.venv/
+env/
+**/venv/
+**/.venv/
+**/env/
+
+# =========================================================
+# Python build / cache artifacts
+# =========================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+
+# =========================================================
+# Data pulled from the paid API (licensed / proprietary)
+# =========================================================
+api/input/
+api/output/
+
+# =========================================================
+# Generated outputs — reproducible by running the parsers
+# =========================================================
+excel/standardized_format/output/
+excel/standardized_format/*_updated.xlsx
+
+# =========================================================
+# Raw AMC monthly disclosure files (large binaries).
+# Remove this line if you deliberately want them in the repo
+# (consider Git LFS instead).
+# =========================================================
+excel/monthly_disclosures/
+
+# =========================================================
+# Backups, logs, crash dumps, temp files
+# =========================================================
+*.bak
+*.backup
+*.orig
+*.tmp
+*.log
+*.stackdump
+~$*
+.~lock.*
+
+# =========================================================
+# Editor / OS files
+# =========================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code local settings
+.claude/settings.local.json

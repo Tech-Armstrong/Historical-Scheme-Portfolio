@@ -1,0 +1,12 @@
+# API pipeline (api/parser.py, api/api_client.py)
+requests>=2.31
+python-dotenv>=1.0
+openpyxl>=3.1
+
+# Neo4j loader (ingestion-pipeline/neo4j_data.py)
+neo4j>=5.0
+
+# Excel pipeline (excel/standardized_format, excel/scheme_master_mapping)
+pandas>=2.0,<3.0
+xlrd>=2.0.1      # legacy .xls disclosures (e.g. Axis)
+pyxlsb>=1.0.10   # .xlsb disclosures (e.g. PGIM)

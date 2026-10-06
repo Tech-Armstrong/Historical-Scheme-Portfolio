@@ -1,0 +1,128 @@
+amc_name,source_scheme_name,scheme_code,canonical_scheme_name,master_scheme_name,fund_house,category,match_type,note,seen_in_holdings
+Aditya Birla Sun Life Mutual Fund,ADITYA BIRLA SUN LIFE FRONTLINE EQUITY FUND,103174,Aditya Birla Sun Life Large Cap Fund,ABSL Large Cap Fund-Growth,Aditya Birla Sun Life,LARGE CAP,renamed,Renamed: ABSL Frontline Equity Fund -> ABSL Large Cap Fund,True
+,ADITYA BIRLA SUN LIFE LARGE CAP FUND,103174,Aditya Birla Sun Life Large Cap Fund,ABSL Large Cap Fund-Growth,Aditya Birla Sun Life,LARGE CAP,direct,,False
+Aditya Birla Sun Life Mutual Fund,ADITYA BIRLA SUN LIFE MIDCAP FUND,101592,Aditya Birla Sun Life Midcap Fund,ABSL Midcap Fund - Growth,Aditya Birla Sun Life,MID CAP,direct,,True
+Aditya Birla Sun Life Mutual Fund,ADITYA BIRLA SUN LIFE SMALL CAP FUND,105804,Aditya Birla Sun Life Small Cap Fund,ABSL Small Cap Fund - Growth,Aditya Birla Sun Life,SMALL CAP,direct,,True
+Aditya Birla Sun Life Mutual Fund,ADITYA BIRLA SUN LIFE PURE VALUE FUND,108167,Aditya Birla Sun Life Value Fund,ABSL Value Fund - Growth,Aditya Birla Sun Life,VALUE,renamed,Renamed: ABSL Pure Value Fund -> ABSL Value Fund,True
+,ADITYA BIRLA SUN LIFE VALUE FUND,108167,Aditya Birla Sun Life Value Fund,ABSL Value Fund - Growth,Aditya Birla Sun Life,VALUE,direct,,False
+Axis Mutual Fund,AXIS BUSINESS CYCLES FUND,151366,Axis Business Cycles Fund,Axis Business Cycles Fund - Regular - Growth,Axis,THEMATIC BUSINESS CYCLE,direct,,True
+Axis Mutual Fund,AXIS FOCUSED 25 FUND,117560,Axis Focused Fund,Axis Focused Fund - Regular - Growth,Axis,FOCUSED,renamed,Renamed: Axis Focused 25 Fund -> Axis Focused Fund,True
+Axis Mutual Fund,AXIS FOCUSED FUND,117560,Axis Focused Fund,Axis Focused Fund - Regular - Growth,Axis,FOCUSED,direct,,True
+Axis Mutual Fund,AXIS BLUECHIP FUND,112277,Axis Large Cap Fund,Axis Large Cap Fund - Regular - Growth,Axis,LARGE CAP,renamed,Renamed: Axis Bluechip Fund -> Axis Large Cap Fund,True
+,AXIS BLUECHIP FUND^^,112277,Axis Large Cap Fund,Axis Large Cap Fund - Regular - Growth,Axis,LARGE CAP,renamed,Renamed: Axis Bluechip Fund -> Axis Large Cap Fund,False
+Axis Mutual Fund,AXIS LARGE CAP FUND,112277,Axis Large Cap Fund,Axis Large Cap Fund - Regular - Growth,Axis,LARGE CAP,direct,,True
+Axis Mutual Fund,AXIS LARGE CAP FUND^^,112277,Axis Large Cap Fund,Axis Large Cap Fund - Regular - Growth,Axis,LARGE CAP,variant,Footnote marker ^^ (name-change footnote),True
+Axis Mutual Fund,AXIS MIDCAP FUND,114564,Axis Midcap Fund,Axis Midcap Fund - Regular - Growth,Axis,MID CAP,direct,,True
+Axis Mutual Fund,AXIS SMALL CAP FUND,125350,Axis Small Cap Fund,Axis Small Cap Fund - Regular - Growth,Axis,SMALL CAP,direct,,True
+Axis Mutual Fund,AXIS VALUE FUND,149167,Axis Value Fund,Axis Value Fund - Regular - Growth,Axis,VALUE,direct,,True
+Baroda BNP Paribas Mutual Fund,BARODA BNP PARIBAS BUSINESS CYCLE FUND,149140,Baroda BNP Paribas Business Cycle Fund,Baroda BNP Paribas Business Cycle Fund - Regular - Growth,Baroda BNP Paribas,THEMATIC BUSINESS CYCLE,direct,,True
+Baroda BNP Paribas Mutual Fund,BARODA BNP PARIBAS FOCUSED FUND,150263,Baroda BNP Paribas Focused Fund,Baroda BNP Paribas Focused Fund - Regular - Growth,Baroda BNP Paribas,FOCUSED,direct,,True
+Baroda BNP Paribas Mutual Fund,BARODA BNP PARIBAS LARGE CAP FUND,150185,Baroda BNP Paribas Large Cap Fund,Baroda BNP Paribas Large Cap Fund - Regular - Growth,Baroda BNP Paribas,LARGE CAP,direct,,True
+Baroda BNP Paribas Mutual Fund,BARODA BNP PARIBAS MID CAP FUND,150209,Baroda BNP Paribas Mid Cap Fund,Baroda BNP Paribas Mid Cap Fund - Regular - Growth,Baroda BNP Paribas,MID CAP,direct,,True
+Baroda BNP Paribas Mutual Fund,BARODA BNP PARIBAS SMALL CAP FUND,152130,Baroda BNP Paribas Small Cap Fund,Baroda BNP Paribas Small Cap Fund - Regular - Growth,Baroda BNP Paribas,SMALL CAP,direct,,True
+Baroda BNP Paribas Mutual Fund,BARODA BNP PARIBAS VALUE FUND,151747,Baroda BNP Paribas Value Fund,Baroda BNP Paribas Value Fund - Regular - Growth,Baroda BNP Paribas,VALUE,direct,,True
+Canara Robeco Mutual Fund,CANARA ROBECO FOCUSED EQUITY FUND,148884,Canara Robeco Focused Fund,Canara Robeco Focused Fund - Regular - Growth,Canara Robeco,FOCUSED,renamed,Renamed: Canara Robeco Focused Equity Fund -> Canara Robeco Focused Fund,True
+Canara Robeco Mutual Fund,CANARA ROBECO FOCUSED FUND,148884,Canara Robeco Focused Fund,Canara Robeco Focused Fund - Regular - Growth,Canara Robeco,FOCUSED,direct,,True
+Canara Robeco Mutual Fund,CANARA ROBECO BLUE CHIP EQUITY FUND,113221,Canara Robeco Large Cap Fund,Canara Robeco Large Cap Fund - Regular - Growth,Canara Robeco,LARGE CAP,renamed,Renamed: Canara Robeco Bluechip Equity Fund -> Canara Robeco Large Cap Fund,True
+,CANARA ROBECO BLUECHIP EQUITY FUND,113221,Canara Robeco Large Cap Fund,Canara Robeco Large Cap Fund - Regular - Growth,Canara Robeco,LARGE CAP,renamed,Renamed: Canara Robeco Bluechip Equity Fund -> Canara Robeco Large Cap Fund,False
+Canara Robeco Mutual Fund,CANARA ROBECO LARGE CAP FUND,113221,Canara Robeco Large Cap Fund,Canara Robeco Large Cap Fund - Regular - Growth,Canara Robeco,LARGE CAP,direct,,True
+,CANARA ROBECO EMERGING EQUITIES,102920,Canara Robeco Large and Mid Cap Fund,Canara Robeco Large and Mid Cap Fund - Regular Growth,Canara Robeco,LARGE & MID CAP,renamed,Renamed: Canara Robeco Emerging Equities -> Canara Robeco Large and Mid Cap Fund,False
+Canara Robeco Mutual Fund,CANARA ROBECO MID CAP FUND,150816,Canara Robeco Mid Cap Fund,Canara Robeco Mid Cap Fund - Regular - Growth,Canara Robeco,MID CAP,direct,,True
+Canara Robeco Mutual Fund,CANARA ROBECO SMALL CAP FUND,146127,Canara Robeco Small Cap Fund,Canara Robeco Small Cap Fund - Regular - Growth,Canara Robeco,SMALL CAP,direct,,True
+Canara Robeco Mutual Fund,CANARA ROBECO VALUE FUND,149088,Canara Robeco Value Fund,Canara Robeco Value Fund - Regular - Growth,Canara Robeco,VALUE,direct,,True
+,DSP LARGE CAP FUND,101635,DSP Large Cap Fund,DSP Large Cap Fund - Regular - Growth,DSP,LARGE CAP,direct,,False
+DSP Mutual Fund,DSP TOP 100 EQUITY FUND,101635,DSP Large Cap Fund,DSP Large Cap Fund - Regular - Growth,DSP,LARGE CAP,renamed,Renamed: DSP Top 100 Equity Fund -> DSP Large Cap Fund,True
+DSP Mutual Fund,DSP MID CAP FUND,104481,DSP Midcap Fund,DSP Midcap Fund - Regular - Growth,DSP,MID CAP,variant,Spelling: DSP Mid Cap Fund = DSP Midcap Fund,True
+,DSP MIDCAP FUND,104481,DSP Midcap Fund,DSP Midcap Fund - Regular - Growth,DSP,MID CAP,direct,,False
+DSP Mutual Fund,DSP SMALL CAP FUND,105989,DSP Small Cap Fund,DSP Small Cap Fund - Regular - Growth,DSP,SMALL CAP,direct,,True
+DSP Mutual Fund,DSP VALUE FUND,148594,DSP Value Fund,DSP Value Fund - Regular - Growth,DSP,VALUE,direct,,True
+Edelweiss Mutual Fund,EDELWEISS BUSINESS CYCLE FUND,152724,Edelweiss Business Cycle Fund,Edelweiss Business Cycle Fund - Regular - Growth,Edelweiss,THEMATIC BUSINESS CYCLE,direct,,True
+,EDELWEISS FOCUSED EQUITY FUND,150382,Edelweiss Focused Fund,Edelweiss Focused Fund - Regular - Growth,Edelweiss,FOCUSED,renamed,Renamed: Edelweiss Focused Equity Fund -> Edelweiss Focused Fund,False
+Edelweiss Mutual Fund,EDELWEISS FOCUSED FUND,150382,Edelweiss Focused Fund,Edelweiss Focused Fund - Regular - Growth,Edelweiss,FOCUSED,direct,,True
+Edelweiss Mutual Fund,EDELWEISS LARGE CAP FUND,111940,Edelweiss Large Cap Fund,Edelweiss Large Cap Fund - Regular - Growth,Edelweiss,LARGE CAP,direct,,True
+Edelweiss Mutual Fund,EDELWEISS MID CAP FUND,140225,Edelweiss Mid Cap Fund,Edelweiss Mid Cap Fund - Regular - Growth,Edelweiss,MID CAP,direct,,True
+Edelweiss Mutual Fund,EDELWEISS SMALL CAP FUND,146193,Edelweiss Small Cap Fund,Edelweiss Small Cap Fund - Regular - Growth,Edelweiss,SMALL CAP,direct,,True
+HDFC Mutual Fund,HDFC BUSINESS CYCLE FUND,150803,HDFC Business Cycle Fund,HDFC Business Cycle Fund - Growth,HDFC,THEMATIC BUSINESS CYCLE,direct,,True
+HDFC Mutual Fund,HDFC FOCUSED 30 FUND,102760,HDFC Focused Fund,HDFC Focused Fund - Growth,HDFC,FOCUSED,renamed,Renamed: HDFC Focused 30 Fund -> HDFC Focused Fund,True
+,HDFC FOCUSED FUND,102760,HDFC Focused Fund,HDFC Focused Fund - Growth,HDFC,FOCUSED,direct,,False
+HDFC Mutual Fund,HDFC LARGE CAP FUND,102000,HDFC Large Cap Fund,HDFC Large Cap Fund - Growth - Regular,HDFC,LARGE CAP,direct,,True
+HDFC Mutual Fund,HDFC TOP 100 FUND,102000,HDFC Large Cap Fund,HDFC Large Cap Fund - Growth - Regular,HDFC,LARGE CAP,renamed,Renamed: HDFC Top 100 Fund -> HDFC Large Cap Fund,True
+,HDFC MID CAP FUND,105758,HDFC Mid Cap Fund,HDFC Mid Cap Fund - Growth,HDFC,MID CAP,direct,,False
+,HDFC MID CAP OPPORTUNITIES FUND,105758,HDFC Mid Cap Fund,HDFC Mid Cap Fund - Growth,HDFC,MID CAP,renamed,Renamed: HDFC Mid-Cap Opportunities Fund -> HDFC Mid Cap Fund,False
+HDFC Mutual Fund,HDFC MID-CAP OPPORTUNITIES FUND,105758,HDFC Mid Cap Fund,HDFC Mid Cap Fund - Growth,HDFC,MID CAP,renamed,Renamed: HDFC Mid-Cap Opportunities Fund -> HDFC Mid Cap Fund,True
+HDFC Mutual Fund,HDFC SMALL CAP FUND,130502,HDFC Small Cap Fund,HDFC Small Cap Fund - Growth,HDFC,SMALL CAP,direct,,True
+HDFC Mutual Fund,HDFC CAPITAL BUILDER VALUE FUND,101764,HDFC Value Fund,HDFC Value Fund - Growth,HDFC,VALUE,renamed,Renamed: HDFC Capital Builder Value Fund -> HDFC Value Fund,True
+,HDFC VALUE FUND,101764,HDFC Value Fund,HDFC Value Fund - Growth,HDFC,VALUE,direct,,False
+ICICI Prudential Mutual Fund,ICICI PRUDENTIAL BLUECHIP FUND,108466,ICICI Prudential Large Cap Fund,ICICI Pru Large Cap Fund - Growth,ICICI Prudential,LARGE CAP,renamed,Renamed: ICICI Prudential Bluechip Fund -> ICICI Prudential Large Cap Fund,True
+,ICICI PRUDENTIAL LARGE CAP FUND,108466,ICICI Prudential Large Cap Fund,ICICI Pru Large Cap Fund - Growth,ICICI Prudential,LARGE CAP,direct,,False
+,ICICI PRUDENTIAL MID CAP FUND,102528,ICICI Prudential Midcap Fund,ICICI Pru MidCap Fund - Growth,ICICI Prudential,MID CAP,direct,,False
+ICICI Prudential Mutual Fund,ICICI PRUDENTIAL MIDCAP FUND,102528,ICICI Prudential Midcap Fund,ICICI Pru MidCap Fund - Growth,ICICI Prudential,MID CAP,variant,Master abbreviates 'ICICI Pru',True
+,ICICI PRUDENTIAL SMALL CAP FUND,106823,ICICI Prudential Smallcap Fund,ICICI Pru Smallcap Fund - Growth,ICICI Prudential,SMALL CAP,direct,,False
+ICICI Prudential Mutual Fund,ICICI PRUDENTIAL SMALLCAP FUND,106823,ICICI Prudential Smallcap Fund,ICICI Pru Smallcap Fund - Growth,ICICI Prudential,SMALL CAP,variant,Master abbreviates 'ICICI Pru',True
+ICICI Prudential Mutual Fund,ICICI PRUDENTIAL VALUE DISCOVERY FUND,102594,ICICI Prudential Value Fund,ICICI Pru Value Fund - Growth,ICICI Prudential,VALUE,renamed,Renamed: ICICI Prudential Value Discovery Fund -> ICICI Prudential Value Fund,True
+,ICICI PRUDENTIAL VALUE FUND,102594,ICICI Prudential Value Fund,ICICI Pru Value Fund - Growth,ICICI Prudential,VALUE,direct,,False
+,INVESCO INDIA FOCUSED 20 EQUITY FUND,148483,Invesco India Focused Fund,Invesco India Focused Fund - Regular - Growth,Invesco,FOCUSED,renamed,Renamed: Invesco India Focused 20 Equity Fund -> Invesco India Focused Fund,False
+Invesco Mutual Fund,INVESCO INDIA FOCUSED FUND,148483,Invesco India Focused Fund,Invesco India Focused Fund - Regular - Growth,Invesco,FOCUSED,direct,,True
+Invesco Mutual Fund,INVESCO INDIA FOCUSED FUND^^,148483,Invesco India Focused Fund,Invesco India Focused Fund - Regular - Growth,Invesco,FOCUSED,variant,Footnote marker ^^ (formerly Invesco India Focused 20 Equity Fund),True
+Invesco Mutual Fund,INVESCO INDIA LARGECAP FUND,112098,Invesco India Largecap Fund,Invesco India Largecap Fund - Regular - Growth,Invesco,LARGE CAP,direct,,True
+Invesco Mutual Fund,INVESCO INDIA MIDCAP FUND,105503,Invesco India Midcap Fund,Invesco India Midcap Fund - Regular - Growth,Invesco,MID CAP,direct,,True
+Invesco Mutual Fund,INVESCO INDIA SMALLCAP FUND,145139,Invesco India Smallcap Fund,Invesco India Smallcap Fund - Regular - Growth,Invesco,SMALL CAP,direct,,True
+Mahindra Manulife Mutual Fund,MAHINDRA MANULIFE LARGE CAP FUND,146551,Mahindra Manulife Large Cap Fund,Mahindra Manulife Large Cap Fund - Regular - Growth,Mahindra Manulife,LARGE CAP,direct,,True
+Mahindra Manulife Mutual Fund,MAHINDRA MANULIFE MID CAP FUND,142109,Mahindra Manulife Mid Cap Fund,Mahindra Manulife Mid Cap Fund - Regular - Growth,Mahindra Manulife,MID CAP,direct,,True
+Mahindra Manulife Mutual Fund,MAHINDRA MANULIFE SMALL CAP FUND,150912,Mahindra Manulife Small Cap Fund,Mahindra Manulife Small Cap Fund - Regular - Growth,Mahindra Manulife,SMALL CAP,direct,,True
+Mirae Asset Mutual Fund,MIRAE ASSET LARGE CAP FUND,107578,Mirae Asset Large Cap Fund,Mirae Asset Large Cap Fund - Growth,Mirae Asset,LARGE CAP,direct,,True
+,MIRAE ASSET MID CAP FUND,147479,Mirae Asset Midcap Fund,Mirae Asset Midcap Fund - Regular - Growth,Mirae Asset,MID CAP,direct,,False
+Mirae Asset Mutual Fund,MIRAE ASSET MIDCAP FUND,147479,Mirae Asset Midcap Fund,Mirae Asset Midcap Fund - Regular - Growth,Mirae Asset,MID CAP,direct,,True
+Motilal Oswal Mutual Fund,MOTILAL OSWAL BUSINESS CYCLE FUND,152794,Motilal Oswal Business Cycle Fund,Motilal Oswal Business Cycle Fund - Regular - Growth,Motilal Oswal,THEMATIC BUSINESS CYCLE,direct,,True
+Motilal Oswal Mutual Fund,MOTILAL OSWAL FOCUSED FUND,122387,Motilal Oswal Focused Fund,Motilal Oswal Focused Fund - Regular Growth,Motilal Oswal,FOCUSED,direct,,True
+Motilal Oswal Mutual Fund,MOTILAL OSWAL LARGE CAP FUND,152352,Motilal Oswal Large Cap Fund,Motilal Oswal Large Cap Regular Growth,Motilal Oswal,LARGE CAP,variant,Master name lacks 'Fund',True
+,MOTILAL OSWAL MID CAP FUND,127039,Motilal Oswal Midcap Fund,Motilal Oswal Midcap Fund - Regular - Growth,Motilal Oswal,MID CAP,direct,,False
+Motilal Oswal Mutual Fund,MOTILAL OSWAL MIDCAP FUND,127039,Motilal Oswal Midcap Fund,Motilal Oswal Midcap Fund - Regular - Growth,Motilal Oswal,MID CAP,direct,,True
+Motilal Oswal Mutual Fund,MOTILAL OSWAL SMALL CAP FUND,152232,Motilal Oswal Small Cap Fund,Motilal Oswal Small Cap Fund - Regular - Growth,Motilal Oswal,SMALL CAP,direct,,True
+Nippon India Mutual Fund,NIPPON INDIA GROWTH FUND,100377,Nippon India Growth Mid Cap Fund,Nippon India Growth Mid Cap Fund-Growth,Nippon India,MID CAP,renamed,Renamed: Nippon India Growth Fund -> Nippon India Growth Mid Cap Fund,True
+,NIPPON INDIA GROWTH MID CAP FUND,100377,Nippon India Growth Mid Cap Fund,Nippon India Growth Mid Cap Fund-Growth,Nippon India,MID CAP,direct,,False
+Nippon India Mutual Fund,NIPPON INDIA LARGE CAP FUND,106235,Nippon India Large Cap Fund,Nippon India Large Cap Fund - Growth,Nippon India,LARGE CAP,direct,,True
+Nippon India Mutual Fund,NIPPON INDIA SMALL CAP FUND,113177,Nippon India Small Cap Fund,Nippon India Small Cap Fund - Growth,Nippon India,SMALL CAP,direct,,True
+Nippon India Mutual Fund,NIPPON INDIA VALUE FUND,103085,Nippon India Value Fund,Nippon India Value Fund - Growth,Nippon India,VALUE,direct,,True
+PGIM India Mutual Fund,PGIM INDIA LARGE CAP FUND,138308,PGIM India Large Cap Fund,PGIM India Large Cap Fund - Growth,PGIM India,LARGE CAP,direct,,True
+,PGIM INDIA MIDCAP FUND,125305,PGIM India Midcap Fund,PGIM India Midcap Fund - Regular - Growth,PGIM India,MID CAP,direct,,False
+PGIM India Mutual Fund,PGIM INDIA MIDCAP OPPORTUNITIES FUND,125305,PGIM India Midcap Fund,PGIM India Midcap Fund - Regular - Growth,PGIM India,MID CAP,renamed,Renamed: PGIM India Midcap Opportunities Fund -> PGIM India Midcap Fund,True
+PGIM India Mutual Fund,PGIM INDIA SMALL CAP FUND,149020,PGIM India Small Cap Fund,PGIM India Small Cap Fund - Regular - Growth,PGIM India,SMALL CAP,direct,,True
+Sundaram Mutual Fund,SUNDARAM BUSINESS CYCLE FUND,152678,Sundaram Business Cycle Fund,Sundaram Business Cycle Fund - Regular Plan - Growth,Sundaram,THEMATIC BUSINESS CYCLE,direct,,True
+Sundaram Mutual Fund,SUNDARAM FOCUSED FUND,149532,Sundaram Focused Fund,Sundaram Focused Fund - Growth,Sundaram,FOCUSED,direct,,True
+Sundaram Mutual Fund,SUNDARAM LARGE CAP FUND,148504,Sundaram Large Cap Fund,Sundaram Large Cap Fund - Regular - Growth,Sundaram,LARGE CAP,direct,,True
+Sundaram Mutual Fund,SUNDARAM MID CAP FUND,101539,Sundaram Mid Cap Fund,Sundaram Mid Cap Fund Regular - Growth,Sundaram,MID CAP,direct,,True
+Sundaram Mutual Fund,SUNDARAM SMALL CAP FUND,100795,Sundaram Small Cap Fund,Sundaram Small Cap Fund Regular - Growth,Sundaram,SMALL CAP,direct,,True
+,SUNDARAM DIVERSIFIED EQUITY,101853,Sundaram Value Fund,Sundaram Value Fund Regular - Growth,Sundaram,VALUE,renamed,Renamed: Sundaram Diversified Equity -> Sundaram Value Fund (title has no 'Fund'; Jan 2024-Aug 2025 files),False
+Sundaram Mutual Fund,SUNDARAM VALUE FUND,101853,Sundaram Value Fund,Sundaram Value Fund Regular - Growth,Sundaram,VALUE,direct,,True
+Tata Mutual Fund,TATA LARGE CAP FUND,100475,Tata Large Cap Fund,Tata Large Cap Fund - Regular - Growth,Tata,LARGE CAP,direct,,True
+,TATA MID CAP FUND,102328,Tata Mid Cap Fund,Tata Mid Cap Fund Regular - Growth,Tata,MID CAP,direct,,False
+Tata Mutual Fund,TATA MID CAP GROWTH FUND,102328,Tata Mid Cap Fund,Tata Mid Cap Fund Regular - Growth,Tata,MID CAP,renamed,Renamed: Tata Mid Cap Growth Fund -> Tata Mid Cap Fund,True
+Tata Mutual Fund,TATA SMALL CAP FUND,145208,Tata Small Cap Fund,Tata Small Cap Fund-Regular-Growth,Tata,SMALL CAP,direct,,True
+Tata Mutual Fund,TATA EQUITY P/E FUND,101672,Tata Value Fund,Tata Value Fund - Regular - Growth,Tata,VALUE,renamed,Renamed: Tata Equity P/E Fund -> Tata Value Fund,True
+,TATA VALUE FUND,101672,Tata Value Fund,Tata Value Fund - Regular - Growth,Tata,VALUE,direct,,False
+UTI Mutual Fund,UTI - LARGE CAP FUND,100651,UTI Large Cap Fund,UTI Large Cap Fund - Regular - Growth,UTI,LARGE CAP,variant,Formatting: 'UTI - ' prefix (formerly UTI Mastershare),True
+,UTI LARGE CAP FUND,100651,UTI Large Cap Fund,UTI Large Cap Fund - Regular - Growth,UTI,LARGE CAP,direct,,False
+,UTI MASTERSHARE UNIT SCHEME,100651,UTI Large Cap Fund,UTI Large Cap Fund - Regular - Growth,UTI,LARGE CAP,renamed,Renamed: UTI Mastershare Unit Scheme -> UTI Large Cap Fund,False
+UTI Mutual Fund,UTI - MID CAP FUND,102394,UTI Mid Cap Fund,UTI Mid Cap Fund-Growth,UTI,MID CAP,variant,Formatting: 'UTI - ' prefix,True
+,UTI MID CAP FUND,102394,UTI Mid Cap Fund,UTI Mid Cap Fund-Growth,UTI,MID CAP,direct,,False
+UTI Mutual Fund,UTI SMALL CAP FUND,148617,UTI Small Cap Fund,UTI Small Cap Fund - Regular - Growth,UTI,SMALL CAP,direct,,True
+Union Mutual Fund,UNION LARGECAP FUND,141247,Union Largecap Fund,Union Largecap Fund - Regular - Growth,Union,LARGE CAP,direct,,True
+Union Mutual Fund,UNION MIDCAP FUND,148071,Union Midcap Fund,Union Midcap Fund - Regular - Growth,Union,MID CAP,direct,,True
+Union Mutual Fund,UNION SMALL CAP FUND,129647,Union Small Cap Fund,Union Small Cap Fund - Regular - Growth,Union,SMALL CAP,direct,,True
+,UNION VALUE DISCOVERY FUND,145471,Union Value Fund,Union Value Fund - Regular - Growth,Union,VALUE,renamed,Renamed: Union Value Discovery Fund -> Union Value Fund,False
+,UNION VALUE FUND,145471,Union Value Fund,Union Value Fund - Regular - Growth,Union,VALUE,direct,,False
+Union Mutual Fund,UNION VALUE FUND (FORMARLY KNOWN AS VALUE DISCOVERY FUND),145471,Union Value Fund,Union Value Fund - Regular - Growth,Union,VALUE,renamed,Renamed: Union Value Discovery Fund -> Union Value Fund (AMC typo 'FORMARLY'),True
+Union Mutual Fund,UNION VALUE FUND (FORMERLY UNION VALUE DISCOVERY FUND),145471,Union Value Fund,Union Value Fund - Regular - Growth,Union,VALUE,renamed,Renamed: Union Value Discovery Fund -> Union Value Fund,True
+Union Mutual Fund,UNION VALUE FUND (FORMERLY UNION VALUE DISCOVERY FUND)***,145471,Union Value Fund,Union Value Fund - Regular - Growth,Union,VALUE,renamed,Renamed: Union Value Discovery Fund -> Union Value Fund (footnote ***),True
+WhiteOak Capital Mutual Fund,WHITEOAK CAPITAL LARGE CAP FUND,150799,WhiteOak Capital Large Cap Fund,WhiteOak Capital Large Cap Fund Regular Growth,WhiteOak Capital,LARGE CAP,direct,,True
+WhiteOak Capital Mutual Fund,WHITEOAK CAPITAL MID CAP FUND,150583,WhiteOak Capital Mid Cap Fund,WhiteOak Capital Mid Cap Fund Regular Growth,WhiteOak Capital,MID CAP,direct,,True
+HSBC Mutual Fund,HSBC LARGE CAP FUND,101594,HSBC Large Cap Fund,HSBC Large Cap Fund - Regular Growth,HSBC,LARGE CAP,direct,,True
+,HSBC LARGE CAP EQUITY FUND,101594,HSBC Large Cap Fund,HSBC Large Cap Fund - Regular Growth,HSBC,LARGE CAP,renamed,Renamed: HSBC Large Cap Equity Fund -> HSBC Large Cap Fund,False
+HSBC Mutual Fund,HSBC MIDCAP FUND,151034,HSBC Midcap Fund,HSBC Midcap Fund - Regular Growth,HSBC,MID CAP,direct,,True
+,HSBC MID CAP FUND,151034,HSBC Midcap Fund,HSBC Midcap Fund - Regular Growth,HSBC,MID CAP,variant,,False
+HSBC Mutual Fund,HSBC SMALL CAP FUND,151133,HSBC Small Cap Fund,HSBC Small Cap Fund - Regular Growth,HSBC,SMALL CAP,direct,,True
+HSBC Mutual Fund,HSBC VALUE FUND,151110,HSBC Value Fund,HSBC Value Fund - Regular Growth,HSBC,VALUE,direct,,True
+HSBC Mutual Fund,HSBC FOCUSED FUND,148409,HSBC Focused Fund,HSBC Focused Fund - Regular Growth,HSBC,FOCUSED,direct,,True
+HSBC Mutual Fund,HSBC BUSINESS CYCLES FUND,151144,HSBC Business Cycles Fund,HSBC Business Cycles Fund - Regular Growth,HSBC,THEMATIC BUSINESS CYCLE,direct,,True
+,HSBC BUSINESS CYCLE FUND,151144,HSBC Business Cycles Fund,HSBC Business Cycles Fund - Regular Growth,HSBC,THEMATIC BUSINESS CYCLE,variant,,False
