@@ -206,7 +206,7 @@ MONTH_NUM = {
 }
 AMC_STD = {"Aditya Birla Capital Mutual Fund": "Aditya Birla Sun Life Mutual Fund", "Axis Mutual Fund": "Axis Mutual Fund",
            "Baroda BNP Paribas Mutual Fund": "Baroda BNP Paribas Mutual Fund", "Canara Robeco Mutual Fund": "Canara Robeco Mutual Fund",
-           "DSP Mutual Fund": "DSP Mutual Fund", "Edelweiss Mutual Fund": "Edelweiss Mutual Fund", "HDFC Mutual Fund": "HDFC Mutual Fund", "HSBC Mutual Fund": "HSBC Mutual Fund","ICICI Prudential Mutual Fund": "ICICI Prudential Mutual Fund",
+           "DSP Mutual Fund": "DSP Mutual Fund", "Edelweiss Mutual Fund": "Edelweiss Mutual Fund", "HDFC Mutual Fund": "HDFC Mutual Fund", "HSBC Mutual Fund": "HSBC Mutual Fund", "SBI Mutual Fund": "SBI Mutual Fund", "Kotak Mahindra Mutual Fund": "Kotak Mahindra Mutual Fund", "Parag Parikh Mutual Fund": "PPFAS Mutual Fund","ICICI Prudential Mutual Fund": "ICICI Prudential Mutual Fund",
            "Invesco India Mutual Fund": "Invesco Mutual Fund", "Mahindra Mutual Fund": "Mahindra Manulife Mutual Fund",
            "Mirae Asset Mutual Fund": "Mirae Asset Mutual Fund", "Motilal Mutual Fund": "Motilal Oswal Mutual Fund", "Nippon Mutual Fund": "Nippon India Mutual Fund",
            "PGIM Mutual Fund": "PGIM India Mutual Fund", "Sundaram Mutual Fund": "Sundaram Mutual Fund", "Tata Mutual Fund": "Tata Mutual Fund",
@@ -543,12 +543,25 @@ def get_market_cap_file(year, month_num):
         )
 
     if not mapping_file.exists():
-        raise FileNotFoundError(
-            f"\nMarket cap mapping required but not found:\n"
-            f"  Year: {year}\n"
-            f"  Month: {month_num}\n"
-            f"  Expected file: {mapping_file}\n"
-        )
+        # The AMFI list for the current half-year is only published after it
+        # ends (e.g. Dec 2026 list in Jan 2027). Until then use the latest
+        # earlier list instead of skipping the disclosure.
+        candidates = []
+        for f in MARKET_CAP_ROOT.glob("*/market_cap_*_*.xlsx"):
+            m = re.match(r"market_cap_(June|December)_(\d{4})\.xlsx$", f.name)
+            if m:
+                candidates.append(((int(m.group(2)), 6 if m.group(1) == "June" else 12), f))
+        earlier = [c for c in candidates if c[0] < (year, 6 if month_num <= 6 else 12)]
+        if not earlier:
+            raise FileNotFoundError(
+                f"\nMarket cap mapping required but not found:\n"
+                f"  Year: {year}\n"
+                f"  Month: {month_num}\n"
+                f"  Expected file: {mapping_file}\n"
+            )
+        fallback = max(earlier)[1]
+        print(f"  NOTE: {mapping_file.name} not available yet - using latest list {fallback.name}")
+        return fallback
 
     return mapping_file
 
@@ -776,10 +789,12 @@ def find_parent_company(isin, name, year, month_num):
     return hits[0] if len(hits) == 1 else None
 
 
-HEADER_MAP = [("isin", r'\bisin'), ("coupon", r'coupon'), ("instrument_name", r'name|instrument'), ("industry_rating", r'industry|rating'),
+# derivative_exposure_pct: Canara "Outstanding derivative exposure as % to net assets Long / (Short)" (per-stock hedge,
+# no separate futures lines); listed first so "exposure" / "% to net assets" do not claim the column
+HEADER_MAP = [("derivative_exposure_pct", r'derivative exposure'), ("isin", r'\bisin'), ("coupon", r'coupon'), ("instrument_name", r'name|instrument'), ("industry_rating", r'industry|rating'),
               ("quantity", r'quantity'), ("market_value", r'market|mkt val|exposure'), ("pct_nav", r'% ?to|% of net|to nav|net assets|% to aum'),
               ("ytc", r'ytc|yield to call'), ("yield", r'yield|ytm'), ("maturity_date", r'maturity'), ("put_call", r'put/call'),
-              ("market_cap", r'market capitali'), ("derivative_pct", r'^derivative$'), ("unhedged_pct", r'^unhedged$'), ("notes", r'notes'),
+              ("market_cap", r'market capitali'), ("derivative_pct", r'^derivative( % to nav)?$'), ("unhedged_pct", r'^unhedged( % to nav)?$'), ("notes", r'notes'),
               ("serial_no", r'sr\.? ?no|sl no')]
 
 def map_header(row):
@@ -796,10 +811,21 @@ def map_header(row):
             if re.search(rx, h): cols[fld] = c; break
     return cols
 
+def kotak_fallback_name(txts, cells, cols):
+    """Name when the header's name column is empty. Kotak puts a coupon tag ("FRB", "ZCB") in its own column
+    left of the name and prints "Total" / "Grand Total" in the Industry / Rating column."""
+    txts = [v for v in txts if not re.match(r'^\s*(FRB|FRN|ZCB|VRR|STRIPS)\s*$', v, re.I)]
+    name = txts[0] if txts else ""
+    ir = cells.get(cols.get("industry_rating")) if "industry_rating" in cols else None
+    if not str(name).strip() and isinstance(ir, str) and re.match(r'^\s*(grand total|sub ?total|total)\s*$', ir, re.I):
+        name = ir
+    return name
+
+
 END_RX = re.compile(r'^(grand total|net assets?:?$|total net assets|total : (?!others).*)', re.I)
 TOTAL_RX = re.compile(r'(^|\b)(sub ?total|total)\b', re.I)
 # rows that carry a value but are really section headers (ICICI style)
-VALUED_SECTION = re.compile(r'^(equity & equity related instruments.*|foreign securities.*|privately placed/unlisted|listed / awaiting listing on stock exchanges|money market instruments|treasury bills|others|debt instruments|unlisted|certificate of deposits|commercial papers|term deposits|units of .*)$', re.I)
+VALUED_SECTION = re.compile(r'^(equity & equity related instruments.*|foreign securities.*|privately placed/unlisted|[b-e]\) listed/awaiting listing.*|listed / awaiting listing on stock exchanges|money market instruments|treasury bills|others|debt instruments|unlisted|certificate of deposits|commercial papers|term deposits|units of .*)$', re.I)
 SECTION_LIKE = re.compile(r'^(\(?[a-fA-F]\)\s*(?!repo\b)|equity|foreign securities|debt|money market|others?$|derivatives|reit|mutual fund units|exchange traded|cash & cash|other current|treps$|treps /|treps - tri|triparty repo/|cblo/|reverse repo /|short term deposits|treasury bill|units of|term deposits|deposits|certificate|commercial|privately|securiti|unlisted|listed|index / stock)', re.I)
 SYMBOLS = re.compile(r'(\*\*|\*|£|@|#|\^|\$|~|&$)\s*$')
 
@@ -825,8 +851,31 @@ COVERED_CALL_SUFFIX = "-CC"
 # Money market instruments are classified under "Debt" (Neo4j schema has no Money Market asset class)
 MONEY_MARKET_SUB_TYPES = {"Treasury Bills", "Commercial Paper", "Certificate of Deposit"}
 # Futures/options are classified under "Equity" with equityType "Derivatives" (Neo4j schema has no Derivatives asset class)
-DERIVATIVE_SUB_TYPES = {"Index Futures", "Stock Futures", "Index Options", "Stock Options"}
-DERIVATIVE_CODES = {"Index Futures": "IF", "Index Options": "IO", "Stock Futures": "SF", "Stock Options": "SO"}
+# Commodities (Multi Asset funds) are their own asset class, split by sub type:
+#   Physical   - Edelweiss "Others > a) Gold / Silver", Tata "A) COMMODITIES PHYSICAL"
+#   Derivative - exchange traded commodity futures / options: Axis "(b) Commodity Futures (ETCD)",
+#                Edelweiss "(b) Exchange Traded Commodity Derivatives", ICICI "Exchange Traded Commodity Derivatives >
+#                A) LISTED ON COMMODITY EXCHANGES (Quantity in Lots)", Nippon "Commodity Options" and
+#                "Details of Commodity Future / Index Future", Tata "B) LISTED ON COMMODITY EXCHANGES (Quantity in Lots)"
+COMMODITY_PHYSICAL, COMMODITY_DERIVATIVE = "Physical", "Derivative"
+# the commodity "Derivative" sub type shares the synthetic ISIN / Long-Short handling of equity F&O
+DERIVATIVE_SUB_TYPES = {"Index Futures", "Stock Futures", "Index Options", "Stock Options", "Currency Futures", COMMODITY_DERIVATIVE}
+DERIVATIVE_CODES = {"Index Futures": "IF", "Index Options": "IO", "Stock Futures": "SF", "Stock Options": "SO", "Currency Futures": "CF", COMMODITY_DERIVATIVE: "CO"}
+# commodity contract names: ICICI "Gold (1 KG-1000 GMS) Commodity April 2024 Future", Axis "Silver March 2026 Commodity Future",
+# Tata "GOLD (1 KG-1000 GMS) COMMODITYFEB2024CFUT", Nippon "FUTCOM_SILVER_03/05/2024", Edelweiss "GOLDMINI-05Feb2026-MCX"
+COMMODITY_DERIVATIVE_NAME = re.compile(r'commodity\s*[a-z]+\s*\d{4}\s*(future|cfut)|commodity future|^futcom_|^(gold|silver)\w*-\d', re.I)
+
+
+def commodity_name(name):
+    """Underlying commodity: "GOLD MINI (100 GRAMS) COMMODITY" -> GOLD, "FUTCOM_CRUDEOIL_19/03/2024" -> CRUDEOIL."""
+    m = re.match(r"[A-Za-z]+", re.sub(r"^(physical\s+|futcom_)", "", str(name or "").strip(), flags=re.I))
+    return m.group(0).upper() if m else "COMMODITY"
+
+
+def is_futures(df):
+    """Futures rows (stock / index / currency / commodity, not options) for the grand-total exclusion checks."""
+    st, nm = df.asset_sub_type.fillna(""), df.instrument_name.fillna("")
+    return st.str.contains("Futures") | ((st == COMMODITY_DERIVATIVE) & ~nm.str.contains(r'option|\b(?:call|put)\b', case=False))
 
 
 def derivative_isin(sub_type, name):
@@ -839,25 +888,52 @@ def derivative_isin(sub_type, name):
     """
     code = DERIVATIVE_CODES[sub_type]
     name = re.sub(r"\s+", " ", str(name or "")).strip()
-    prefix = "NIFTY" if code in ("IF", "IO") else "".join(w[0] for w in re.findall(r"[A-Za-z0-9]+", name)).upper()
+    pair = re.search(r"(USD|EUR|GBP|JPY)(INR)", name.upper())
+    prefix = "NIFTY" if code in ("IF", "IO") else (pair.group(0) if code == "CF" and pair else (
+        commodity_name(name) if code == "CO" else "".join(w[0] for w in re.findall(r"[A-Za-z0-9]+", re.sub(r"-[A-Za-z]{3}\d{4}$", "", name))).upper()))
     n = int(hashlib.sha1(f"{code}|{name.upper()}".encode("utf-8")).hexdigest(), 16)
     chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     suffix = "".join(chars[(n >> (6 * k)) % 36] for k in range(6))
     return f"{prefix}-{code}-{suffix}"
 
+def isin_security_type(isin):
+    """
+    Security-type code of a corporate ISIN (characters 8-9 of INE<co>NN<serial><chk>):
+    01 equity, 07/08/09 debentures/bonds, 14 commercial paper, 15 securitised debt (PTC), 16 certificate of deposit, ...
+    Once an issuer exhausts a series NSDL swaps the leading digit for a letter and keeps the
+    last one: Axis Bank CD INE238AD6579 -> "D6" = 16, Kotak Mahindra Prime NCD INE916DA7RW2 -> "A7" = 07.
+    """
+    if not (isin and len(isin) == 12 and isin.startswith("INE")):
+        return ""
+    code = isin[7:9]
+    if re.fullmatch(r'[A-Z]\d', code):
+        return {"6": "16", "5": "15", "4": "14", "7": "07", "8": "08", "9": "09"}.get(code[1], code)
+    return code
+
+
 def classify(sec, name, isin, ind):
     s, n, i, il = sec.lower(), name.lower(), isin or "", (ind or "").lower()
-    st9 = i[7:9] if len(i) == 12 and i.startswith("INE") else ""
+    st9 = isin_security_type(i)
     if re.search(r'net receivable|net current asset|current assets|net payable|cash / net|^accrued interest$', n): return "Cash and Cash Equivalents", "Net Receivables / (Payables)"
     if "margin" in n and not i: return "Cash and Cash Equivalents", "Margin Money (Derivatives)"
     if re.search(r'cash and bank|cash & bank', n): return "Cash and Cash Equivalents", "Cash & Bank Balance"
     if re.search(r'^cash & cash equivalents?:?$', n): return "Cash and Cash Equivalents", "Cash & Equivalents (Aggregate)"
     # TREPS lines by name first: Edelweiss prints the TREPS block straight after the Derivatives block (section lineage still says derivatives)
-    if re.search(r'treps|tri-?party|reverse repo|cblo|^repo$', n) or (n.startswith("clearing corporation of india") and "std" not in n): return "Cash and Cash Equivalents", "TREPS / Reverse Repo"
-    if re.search(r'\b(put|call)\b', n) and ("option" in il or "deriv" in s): return "Equity", "Index Options" if re.search(r'nifty|sensex|bank nifty', n) else "Stock Options"
+    if re.search(r'treps|tri-?party|reverse repo|cblo|^repo$|^[a-e]\) repo$', n) or (n.startswith("clearing corporation of india") and "std" not in n): return "Cash and Cash Equivalents", "TREPS / Reverse Repo"
+    # Physical commodities held by multi-asset funds (Edelweiss "Others > a) Gold": row "Gold", AMC code IDIA00500001;
+    # Tata "A) COMMODITIES PHYSICAL": "SILVER (30 KG) COMMODITY")
+    if re.fullmatch(r'(physical\s+)?(gold|silver)(\s+bars?.*)?', n) or re.search(r'commodit\w*\s+physical|physical\s+commodit', s):
+        return "Commodities", COMMODITY_PHYSICAL
+    # Exchange-traded commodity derivatives (MCX futures / options)
+    if not (i and i.startswith("IN")) and (re.search(r'commodit', s) or COMMODITY_DERIVATIVE_NAME.search(n)):
+        return "Commodities", COMMODITY_DERIVATIVE
+    # SBI writes options as "NIFTY28-Oct-2025CE24700" under an "Index Options" heading
+    # a real Indian ISIN (equity, REIT/InvIT units, bonds) is never an F&O contract, even under a "Derivatives" heading
+    is_security = bool(i) and i.startswith("IN")
+    if not is_security and (re.search(r'\b(put|call)\b', n) or re.search(r'\d(ce|pe)\d{3,6}$', n)) and ("option" in il or "option" in s or "deriv" in s): return "Equity", "Index Options" if re.search(r'nifty|sensex|bank nifty', n) else "Stock Options"
     # ICICI lists written calls as "<Company> (Covered call)" inside the listed-equity block, without an ISIN
     if "covered call" in n and not i: return "Equity", "Index Options" if re.search(r'nifty|sensex', n) else "Stock Options"
-    if re.search(r'future', n + " " + s + " " + il) or "deriv" in s or re.search(r'_\(\d\d/\d\d/\d{4}\)', n):
+    if not is_security and (re.search(r'future', n + " " + s + " " + il) or "deriv" in s or re.search(r'_\(\d\d/\d\d/\d{4}\)', n) or re.search(r'\dfut$', n)):
         return "Equity", "Index Futures" if re.search(r'nifty|sensex|index', n + il) else "Stock Futures"
     if re.search(r'treps|tri-?party|reverse repo|^a\) repo|cblo|collateralized borrowing', n + " || " + s) or (n.startswith("clearing corporation of india") and "std" not in n):
         return "Cash and Cash Equivalents", "TREPS / Reverse Repo"
@@ -869,6 +945,10 @@ def classify(sec, name, isin, ind):
         if re.search(r'\betf\b|exchange traded', n): return "MF and ETF", "Exchange Traded Funds"
         if "alternative investment" in s: return "MF and ETF", "AIF Units"
         return "MF and ETF", "Mutual Fund Units"
+    # bonds / debentures (incl. CCDs) keep their debt ISIN type even inside a REIT/InvIT block (ICICI Multi Asset Aug 2026: Motherson CCD)
+    if st9 in ("07", "08", "09"): return "Debt", "Corporate Bonds / Debentures"
+    # 15 = PTCs issued by securitisation trusts (Sansar Trust INE0QTL15013, India Universal Trust INE1CBK15037)
+    if st9 == "15" or re.search(r'securiti[sz]ed debt', s): return "Debt", "Securitised Debt"
     if st9 == "25" or re.search(r'\breit\b|real estate investment trust|real estate trust', n + s): return "REITs & InvITs", "REIT Units"
     if st9 == "23" or "infrastructure investment trust" in n or "invit" in n: return "REITs & InvITs", "InvIT Units"
     # Trust a "Preference Shares" heading: Invesco (Aug 2025) prints the pref share without an ISIN, named only by
@@ -876,11 +956,11 @@ def classify(sec, name, isin, ind):
     if st9 == "04" or "preference" in n or "ncrps" in n or "preference share" in s: return "Equity", "Preference Shares"
     if re.match(r'IN002\d{3}[A-Z]', i) or re.search(r't-bill|tbill|treasury bill', n): return "Debt", "Treasury Bills"
     if st9 == "14" or "commercial paper" in n or "commercial paper" in s: return "Debt", "Commercial Paper"
-    # CDs often carry an alphanumeric security code (e.g. Axis Bank INE238AD6579), so also trust the section heading
+    # st9 already maps alphanumeric CD codes (Axis Bank INE238AD6579 -> 16); the heading still catches CDs without an ISIN
     if st9 == "16" or "certificate of deposit" in n or "certificate of deposit" in s: return "Debt", "Certificate of Deposit"
     if re.match(r'IN00\d', i) or "government of india" in n: return "Debt", "Central Government Securities"
     if re.match(r'IN[1-3]\d', i) or "state government" in n or " sdl" in n: return "Debt", "State Development Loans"
-    if st9 in ("07", "08", "09") or ("debt" in s and i): return "Debt", "Corporate Bonds / NCDs"
+    if st9 in ("07", "08", "09") or ("debt" in s and i): return "Debt", "Corporate Bonds / Debentures"
     if "partly paid" in n or "(pp)" in n: return "Equity", "Partly Paid Shares"
     if "dvr" in n: return "Equity", "Listed Equity - DVR"
     if i == "IN9155A01020": return "Equity", "Listed Equity - DVR"
@@ -897,6 +977,39 @@ def classify(sec, name, isin, ind):
 
 UNCLASSIFIED_ROWS = []
 
+SUM_COLUMNS = ("quantity", "market_value_lakhs", "market_value_inr", "pct_to_nav", "margin_lakhs")
+
+
+def merge_duplicate_isins(H):
+    """
+    One row per ISIN per file and record type: locked-in + free shares of the
+    same company, hedged + unhedged blocks (Tata), several strikes of the same
+    option name, etc. are summed so Neo4j's unique-ISIN constraint holds.
+    The kept row is the first one; its name is the shortest variant
+    ("Premier Energies Limited" rather than "... -Locked IN").
+    """
+    if H.empty or "isin" not in H:
+        return H
+    key = H["isin"].notna() & (H["isin"].astype(str) != "")
+    # included / excluded rows stay apart so the NAV reconciliation still holds (hedge legs the AMC leaves out)
+    gkey = ["record_type", "isin", "included_in_net_assets"]
+    dup = key & H.duplicated(gkey, keep=False)
+    if not dup.any():
+        return H
+    rows = []
+    for _, g in H[dup].groupby(gkey, sort=False):
+        first = g.iloc[0].copy()
+        for c in SUM_COLUMNS:
+            if c in g and g[c].notna().any():
+                first[c] = g[c].sum(skipna=True)
+        first["instrument_name"] = min(g.instrument_name.astype(str), key=len)
+        first["pct_below_threshold"] = None if first.get("pct_to_nav") is not None and abs(first["pct_to_nav"] or 0) >= 0.01 and g.pct_below_threshold.isna().any() else first.get("pct_below_threshold")
+        fs = first.get("footnote_symbols")
+        first["footnote_symbols"] = (fs if isinstance(fs, str) else "") + f" [merged {len(g)} rows: {','.join(str(r) for r in g.source_row)}]"
+        rows.append(first)
+    merged = pd.DataFrame(rows)
+    out = pd.concat([H[~dup], merged]).sort_values(["record_type", "source_row"], kind="stable")
+    return out.reset_index(drop=True)
 
 def find_aggregate_rows(df, hdr, cols):
     """
@@ -922,7 +1035,7 @@ def find_aggregate_rows(df, hdr, cols):
         name = cells.get(cols.get("instrument_name")) if "instrument_name" in cols else None
         if name is None or tonum(name) is not None:
             txts = [v for c, v in sorted(cells.items()) if isinstance(v, str) and not ISIN.match(v.strip()) and c != cols.get("industry_rating")]
-            name = txts[0] if txts else ""
+            name = kotak_fallback_name(txts, cells, cols)
         name = norm(name)
         isin_cell = norm(cells.get(cols.get("isin"), "")) if "isin" in cols else ""
         rows[i] = dict(name=name, mv=tonum(cells.get(cols.get("market_value"))) if "market_value" in cols else None,
@@ -958,7 +1071,6 @@ def find_aggregate_rows(df, hdr, cols):
             if len(prev) >= 2 and abs(sum(prev) - r["mv"]) <= max(0.5, 1e-5 * abs(r["mv"])):
                 found[i] = "subtotal"
     return found
-
 
 def parse_file(f):
     parts = re.split(r"[\\/]", os.path.normpath(f))
@@ -1009,7 +1121,8 @@ def parse_file(f):
     toptxt = [norm(v) for _, r in top.iterrows() for v in r if pd.notna(v) and isinstance(v, str)]
     # scheme name / code / date
     scheme = next((t for t in toptxt if re.search(r'fund', t, re.I) and not re.search(r'^(sundaram mutual fund|icici prudential mutual fund|invesco mutual fund|mahindra manulife mutual fund|baroda bnp paribas mutual fund|union mutual fund|uti mutual fund)$', t, re.I) and not re.search(r'mutual fund$|registered office|regulation', t, re.I)), None)
-    if scheme: scheme = re.sub(r'^(monthly )?portfolio statement of\s+|\s+as on .*$', '', scheme, flags=re.I)
+    # "PORTFOLIO STATEMENT OF <scheme> AS ON ..." (Edelweiss/Union), "Portfolio of <scheme>" (Kotak)
+    if scheme: scheme = re.sub(r'^(monthly )?portfolio (statement )?of\s+|\s+as on .*$', '', scheme, flags=re.I)
     if scheme: scheme = SCHEME_ALIASES.get(norm(scheme).upper(), scheme)
     if scheme: scheme = re.split(r'\s*\(an? open|\s*\(\w+ ?cap fund ?-', scheme, flags=re.I)[0].strip()
     # Titles without the word "Fund" (e.g. "Sundaram Diversified Equity") are only found via the name mapping
@@ -1029,6 +1142,17 @@ def parse_file(f):
     dval = next((v for _, r in top.iterrows() for v in r if hasattr(v, "year")), None)
     reported_date = str(dval.date()) if dval is not None else (dtxt or "")
     holdings, totals = [], []
+    # Tata: hedge legs sit in the equity block under the stock's own ISIN, flagged "NAME^", with the
+    # legend "^ Hedging positions through futures as on ..." (other AMCs use ^ for YTC / below-0.01% notes)
+    caret_hedge = any(re.match(r'^\^\s*hedging positions through (commodity )?futures', t) for t in row_texts)
+    # per-stock derivative column rows (Canara / HDFC): options when the HDFC derivative sheet only lists options
+    # (Flexi Cap Jan/Feb 2024 covered calls), futures otherwise
+    stock_derivative_rows, stock_derivative_type = False, "Stock Futures"
+    if len(xf.sheet_names) > 1 and xf.sheet_names[1].lower().startswith("derivative"):
+        dtxt = " ".join(str(v) for v in xf.parse(xf.sheet_names[1], header=None).values.ravel() if isinstance(v, str)).lower()
+        if "option price" in dtxt and "futures price" not in dtxt:
+            stock_derivative_type = "Stock Options"
+    blank_nca = None   # "Net Receivables/(Payables)" printed with no value (Edelweiss Multi Asset Dec 2025)
     sec_path, grand = [], (None, None, None, None)
     last_i = hdr
     for i in range(hdr + 1, len(df)):
@@ -1039,7 +1163,7 @@ def parse_file(f):
         name = g("instrument_name")
         if name is None or tonum(name) is not None:
             txts = [v for c, v in sorted(cells.items()) if isinstance(v, str) and not ISIN.match(v.strip()) and c != cols.get("industry_rating") and not re.match(r'^[A-Z0-9_]{5,12}$', v.strip())]
-            name = txts[0] if txts else ""
+            name = kotak_fallback_name(txts, cells, cols)
         name = norm(name)
         mv, pct_raw = tonum(g("market_value")), g("pct_nav")
         isin_cell = norm(g("isin") or "")
@@ -1056,6 +1180,9 @@ def parse_file(f):
             if kind == "header":
                 sec_path = sec_path[:1] + [name]
             continue
+        if mv is None and tonum(pct_raw) is None and not isin and re.search(r'net receivable|net current asset', name, re.I):
+            blank_nca = (i, name, list(sec_path))
+            continue
         nil = str(g("market_value") or "").strip().upper() == "NIL" or str(pct_raw or "").strip().upper() == "NIL"
         valued_section = bool(VALUED_SECTION.match(name)) and not isin
         is_section = (not isin) and (valued_section or ((mv is None) and tonum(pct_raw) is None) or nil) and bool(SECTION_LIKE.match(name) or (mv is None and tonum(pct_raw) is None))
@@ -1063,7 +1190,7 @@ def parse_file(f):
             if valued_section and mv is not None:
                 totals.append(dict(section_path=name, total_label="(value shown on section header)", market_value_lakhs=mv, pct_raw=pct_raw, source_row=i + 1))
             top_rx = r'^([A-E]\)\s(?!listed|repo)|equity|debt instruments|money market|others?$|derivatives|reit instruments|cash & cash|other current|units of|mutual fund units$|exchange traded funds$|d\) mutual fund units|e\) others|b\) debt|c\) money)'
-            if re.match(r'^(equity & equity|equity and equity|a\) equity|debt instruments?$|investment in mutual fund|b\) debt|money market|c\) money|others?$|d\) mutual|e\) others|derivatives|reit instruments|cash & cash|other current|short term deposits|units of|term deposits|deposits \(|equity & equity related instruments)', name, re.I):
+            if re.match(r'^(equity & equity|equity and equity|a\) equity|debt instruments?$|investment in mutual fund|b\) debt|money market|c\) money|others?$|d\) mutual|e\) others|derivatives|reit instruments|cash & cash|other current|short term deposits|units of|units issued by reits|reits? & invits?|term deposits|deposits \(|equity & equity related instruments|mutual fund units$|real estate investment trusts?$|infrastructure investment trusts?$)', name, re.I):
                 sec_path = [name] + (["(nil)"] if nil else [])
                 if nil: sec_path = [name]
             elif sec_path and re.match(r'^derivatives', sec_path[0], re.I) and re.match(r'^treps', name, re.I):
@@ -1083,6 +1210,16 @@ def parse_file(f):
                                           section_path=" > ".join(sec_path), row_label=name,
                                           market_value_lakhs=mv, pct_raw=pct_raw))
             continue
+        # Tata "^" hedge leg: a futures contract on the stock, not a second holding of the same ISIN
+        # (otherwise merge_duplicate_isins nets it into the long position)
+        if caret_hedge and "^" in syms and ac == "Equity" and st not in DERIVATIVE_SUB_TYPES:
+            st = "Index Futures" if re.search(r'nifty|sensex|\bindex\b', clean, re.I) else "Stock Futures"
+            isin = ""
+        # Kotak "Futures" block: "<Company>-FEB2024" rows carry the underlying stock's ISIN
+        if ac == "Equity" and st not in DERIVATIVE_SUB_TYPES and sec_path and re.match(r'^futures$', sec_path[-1], re.I) \
+                and re.search(r'-[A-Z]{3}\d{4}$', clean, re.I):
+            st = "Index Futures" if re.search(r'nifty|sensex|\bindex\b', clean, re.I) else "Stock Futures"
+            isin = ""
 
 # Keep the original ISIN for market-cap/symbol lookup
         lookup_isin = isin
@@ -1118,6 +1255,9 @@ def parse_file(f):
                 print(f"  WARNING: parent company not found for {st}: {clean!r} (ISIN={isin})")
                 if isin:
                     output_isin = f"{isin}{suffix}"
+        # physical commodities: one ISIN per commodity (AMC codes like IDIA00500001 differ by AMC)
+        if ac == "Commodities" and st == COMMODITY_PHYSICAL:
+            output_isin = commodity_name(clean)
         if not isin and ac == "Cash and Cash Equivalents" and not re.search(r'cash|treps|repo|money market|others|current|margin|deposit|cblo|trepS', " ".join(sec_path), re.I):
             sec_path = [name]
         is_rating = bool(RATING_RX.search(ind_rating)) or ac == "Debt"
@@ -1144,45 +1284,200 @@ def parse_file(f):
             is_placed_as_margin="margin" in (name + " ".join(sec_path)).lower() and ac == "Debt",
             included_in_net_assets=True, footnote_symbols=(syms or "") + (" " + norm(g("notes")) if g("notes") else ""),
         ))
-    # --- derivative disclosure blocks below the grand total (not part of net assets)
-    for j in range(last_i + 1, len(df)):
-        t = " ".join(str(v) for v in df.iloc[j] if pd.notna(v)).lower()
-        if re.search(r'disclosure in derivatives|details of stock future', t):
-            dh = map_header(df.iloc[j] if "quantity" in t else df.iloc[j + 1])
-            if "instrument_name" not in dh or "disclosure" in t: dh["instrument_name"] = df.iloc[j].first_valid_index()
-            k = j + 1
-            while k < len(df):
-                r = df.iloc[k]; cells = {c: v for c, v in r.items() if pd.notna(v) and str(v).strip() != ""}
-                if not cells: break
-                nm = norm(cells.get(dh.get("instrument_name"), "")); mv = tonum(cells.get(dh.get("market_value")))
-                if mv is not None and nm:
-                    ls = next((norm(v) for v in cells.values() if norm(v) in ("Long", "Short")), None)
-                    qty = tonum(cells.get(dh.get("quantity")))
-                    holdings.append(dict(source_file=f"{year}/{month}/{amc_folder}/{fname}", source_sheet=sheet, source_row=k + 1, record_type="DERIVATIVE_DISCLOSURE",
-                        amc_name=AMC_STD[amc_folder], scheme_name=scheme, amc_scheme_code=code, portfolio_date=portfolio_date,
-                        amc_section_l1=norm(df.iloc[j].dropna().iloc[0]), amc_section_l2=None, instrument_name_raw=nm, instrument_name=nm, isin=None,
-                        asset_class="Equity", asset_sub_type="Index Futures" if re.search(r'nifty|index', nm + str(cells.get(dh.get("industry_rating"))), re.I) else "Stock Futures",
-                        industry=norm(cells.get(dh.get("industry_rating"), "")) or None, quantity=qty, market_value_lakhs=mv, market_value_inr=round(mv * 1e5, 2),
-                        pct_to_nav_raw=cells.get(dh.get("pct_nav")), derivative_position=ls or ("Short" if (qty or 0) < 0 else "Long"),
-                        included_in_net_assets=False, is_placed_as_margin=False))
+        # Per-stock derivative column on the equity row, booked as one derivative line named after the stock
+        # (outside net assets; market value is derived from net assets after the loop):
+        #   Canara "Outstanding derivative exposure as % to net assets Long / (Short)" - signed, no futures lines printed
+        #   HDFC "Derivative" / "Derivative % to NAV" - unsigned; "Unhedged" is % to NAV - hedge for a short and
+        #   % to NAV + hedge for a long. Used instead of the dated contracts on the "Derivative..." sheet.
+        dexp = tonum(g("derivative_exposure_pct"))
+        if dexp is None and tonum(g("derivative_pct")):
+            dexp = abs(tonum(g("derivative_pct")))
+            unhedged, held = tonum(g("unhedged_pct")), tonum(pct_raw)
+            # rounding can hide a tiny hedge: treat it as a short, the usual case
+            if not (unhedged is not None and held is not None and unhedged - held >= 0.005):
+                dexp = -dexp
+        if dexp and ac == "Equity" and st not in DERIVATIVE_SUB_TYPES:
+            stock_derivative_rows = True
+            holdings.append(dict(
+                source_file=f"{year}/{month}/{amc_folder}/{fname}", source_sheet=sheet, source_row=i + 1, record_type="DERIVATIVE_DISCLOSURE",
+                amc_name=AMC_STD[amc_folder], scheme_name=scheme, amc_scheme_code=code, portfolio_date=portfolio_date,
+                amc_section_l1="Outstanding derivative exposure", amc_section_l2=sec_path[1] if len(sec_path) > 1 else None,
+                instrument_name_raw=name, instrument_name=clean, isin=None,
+                asset_class="Equity", asset_sub_type=stock_derivative_type, industry=None if is_rating else (ind_rating or None),
+                pct_to_nav_raw=dexp, derivative_position="Short" if dexp < 0 else "Long",
+                included_in_net_assets=False, is_placed_as_margin=False,
+                footnote_symbols="from the derivative exposure column; market value derived from net assets",
+            ))
+    src = f"{year}/{month}/{amc_folder}/{fname}"
+
+    def add_derivative(sh, row, section, nm, sub_type, qty, mv, pct_raw, ls, industry=None, sub=None, **extra):
+        # shorts are booked negative (HSBC prints the value unsigned next to a negative quantity)
+        ls = ls or ("Short" if (qty or 0) < 0 or (mv or 0) < 0 else "Long")
+        if ls == "Short":
+            mv = -abs(mv) if mv is not None else None
+            pct_raw = -abs(tonum(pct_raw)) if tonum(pct_raw) is not None else pct_raw
+        holdings.append(dict(source_file=src, source_sheet=sh, source_row=row + 1, record_type="DERIVATIVE_DISCLOSURE",
+            amc_name=AMC_STD[amc_folder], scheme_name=scheme, amc_scheme_code=code, portfolio_date=portfolio_date,
+            amc_section_l1=section, amc_section_l2=sub, instrument_name_raw=nm, instrument_name=nm, isin=None,
+            asset_class="Commodities" if sub_type == COMMODITY_DERIVATIVE else "Equity", asset_sub_type=sub_type,
+            industry=industry or None, quantity=qty, market_value_lakhs=mv, market_value_inr=round(mv * 1e5, 2) if mv is not None else None,
+            pct_to_nav_raw=pct_raw, derivative_position=ls, included_in_net_assets=False, is_placed_as_margin=False, **extra))
+
+    def has_derivatives():
+        return any(h.get("asset_sub_type") in DERIVATIVE_SUB_TYPES for h in holdings)
+
+    def futures_sub_type(nm, hint=""):
+        if re.search(r'futcur|usdinr|eurinr|gbpinr|jpyinr', nm, re.I): return "Currency Futures"
+        return "Index Futures" if re.search(r'nifty|index|sensex', nm + " " + hint, re.I) else "Stock Futures"
+
+    def long_short(cells):
+        return next((norm(v).title() for v in cells.values() if isinstance(v, str) and norm(v).lower() in ("long", "short")), None)
+
+    def scan_derivative_blocks(d, start, sh):
+        """Derivative tables printed below the grand total (not part of net assets)."""
+        for j in range(start, len(d)):
+            t = " ".join(str(v) for v in d.iloc[j] if pd.notna(v)).lower()
+            # PPFAS prints a plain "Derivatives" table (stock + currency futures) below the grand total
+            # Nippon Multi Asset: "Details of Commodity Future / Index Future" (FUTCOM_SILVER_03/05/2024)
+            # UTI (Jan/Feb 2024): a repeated column header, then a "FUTURES" block (stock futures with the underlying's ISIN)
+            # HSBC (Jan/Feb 2024): "Disclosure in Derivatives | Quantity | Market Value | % To net assets" on the NOTES sheet
+            if re.search(r'disclosure in derivatives|details of (stock|commodity) future|^derivatives$|^futures$', t.strip()):
+                prev = " ".join(str(v) for v in d.iloc[j - 1] if pd.notna(v)).lower()
+                dh = map_header(d.iloc[j] if "quantity" in t else d.iloc[j - 1] if t.strip() == "futures" and "quantity" in prev else d.iloc[j + 1])
+                if "instrument_name" not in dh or "disclosure" in t: dh["instrument_name"] = d.iloc[j].first_valid_index()
+                k, sub = j + 1, None
+                while k < len(d):
+                    r = d.iloc[k]; cells = {c: v for c, v in r.items() if pd.notna(v) and str(v).strip() != ""}
+                    if not cells: break
+                    nm = norm(cells.get(dh.get("instrument_name"), "")); mv = tonum(cells.get(dh.get("market_value")))
+                    # ICICI sub-headings inside the block: "Exchange Traded Commodity Derivatives" > "A) LISTED ON COMMODITY EXCHANGES ..."
+                    if mv is None and nm and len(cells) == 1:
+                        sub = nm
+                    if mv is not None and nm and not TOTAL_RX.search(nm):
+                        is_commodity = bool(re.search(r'commodit', sub or "", re.I) or COMMODITY_DERIVATIVE_NAME.search(nm))
+                        add_derivative(sh, k, norm(d.iloc[j].dropna().iloc[0]), nm,
+                                       COMMODITY_DERIVATIVE if is_commodity else futures_sub_type(nm, str(cells.get(dh.get("industry_rating")))),
+                                       tonum(cells.get(dh.get("quantity"))), mv, cells.get(dh.get("pct_nav")), long_short(cells),
+                                       industry=norm(cells.get(dh.get("industry_rating"), "")), sub=sub)
+                    k += 1
+
+    def scan_hedging_tables(d, start, sh):
+        """
+        SEBI derivative disclosure: "A. Hedging Positions through Futures as on ..." / "B. Other than Hedging
+        Positions through Futures ...", header "Underlying | Long / Short | ... | Margin | [Quantity | Market Value
+        | % to Net Assets]". Only read when the portfolio itself lists no derivatives (Mirae), since most AMCs
+        repeat their inline futures here.
+        Mirae Feb 2024 prints only the margin per stock: the stated "Total exposure due to futures ... as a %age
+        of net assets : -16.12 %" is then split across the stocks pro rata to margin (flagged as estimated).
+        """
+        j = start
+        while j < len(d):
+            t = " ".join(str(v) for v in d.iloc[j] if pd.notna(v)).lower().strip()
+            if not re.match(r'^(\(?[a-e][.)]\s*)?(other than )?hedging positions through (stock |index )?futures', t):
+                j += 1; continue
+            section = norm(d.iloc[j].dropna().iloc[0])
+            hi = next((h for h in range(j + 1, min(j + 4, len(d))) if any(isinstance(v, str) and v.strip().lower().startswith("underlying") for v in d.iloc[h])), None)
+            if hi is None:
+                j += 1; continue
+            col = {}
+            for c, v in d.iloc[hi].items():
+                h = norm(v).lower() if isinstance(v, str) else ""
+                for fld, rx in (("name", r'^underlying'), ("quantity", r'quantity'), ("market_value", r'market|fair value'),
+                                ("pct_nav", r'% ?to net|net assets'), ("margin", r'margin'), ("current_price", r'current price')):
+                    if fld not in col and re.search(rx, h): col[fld] = c; break
+            rows, k = [], hi + 1
+            while k < len(d):
+                cells = {c: v for c, v in d.iloc[k].items() if pd.notna(v) and str(v).strip() != ""}
+                nm = norm(cells.get(col.get("name"), ""))
+                if not cells or re.match(r'^(total|for the|nil$|note)', nm, re.I) or re.match(r'^\(?[a-e][.)]\s', nm, re.I):
+                    break
+                if nm:
+                    rows.append((k, nm, cells))
                 k += 1
+            if "market_value" in col or "pct_nav" in col:
+                for r_i, nm, cells in rows:
+                    mv = tonum(cells.get(col.get("market_value")))
+                    if mv is None and tonum(cells.get(col.get("pct_nav"))) is None: continue
+                    add_derivative(sh, r_i, section, nm, futures_sub_type(nm), tonum(cells.get(col.get("quantity"))), mv,
+                                   cells.get(col.get("pct_nav")), long_short(cells),
+                                   margin_lakhs=tonum(cells.get(col.get("margin"))), current_price=tonum(cells.get(col.get("current_price"))))
+            elif "margin" in col and rows:
+                tail = " ".join(" ".join(str(v) for v in d.iloc[x] if pd.notna(v)) for x in range(k, min(k + 8, len(d))))
+                m = re.search(r'total exposure due to futures.*?net assets\s*:?\s*(-?[\d.]+)\s*%', tail, re.I)
+                margins = [tonum(cells.get(col["margin"])) or 0 for _, _, cells in rows]
+                if m and sum(margins) > 0:
+                    total = abs(float(m.group(1)))
+                    for (r_i, nm, cells), mg in zip(rows, margins):
+                        # stated total is in percent; store in the main sheet's % scale
+                        pct = total * mg / sum(margins) / (100 if pct_is_fraction else 1)
+                        add_derivative(sh, r_i, section, nm, futures_sub_type(nm), None, None, round(pct, 8), long_short(cells),
+                                       margin_lakhs=mg, current_price=tonum(cells.get(col.get("current_price"))),
+                                       footnote_symbols="estimated: stated total futures exposure split pro rata to margin (no quantity / value in source)")
+            j = max(k, j + 1)
+
+    scan_derivative_blocks(df, last_i + 1, sheet)
+    # derivative sheets are read below; other extra sheets may hold the disclosure tables (HSBC "NOTES")
+    extra = {sh: xf.parse(sh, header=None) for sh in xf.sheet_names[1:] if not sh.lower().startswith(("derivative", "disclaimer"))}
+    for sh, d in extra.items():
+        scan_derivative_blocks(d, 0, sh)
+    main_pcts = [tonum(h["pct_to_nav_raw"]) for h in holdings if h["record_type"] == "HOLDING" and tonum(h["pct_to_nav_raw"]) is not None]
+    pct_is_fraction = (grand[1] is not None and abs(grand[1] - 1) < 0.02) or (grand[1] is None and sum(main_pcts) < 5)
+    if not has_derivatives():
+        scan_hedging_tables(df, last_i + 1, sheet)
+        for sh, d in extra.items():
+            if not has_derivatives():
+                scan_hedging_tables(d, 0, sh)
     if len(xf.sheet_names) > 1 and xf.sheet_names[1].lower().startswith("derivative"):
-        d = xf.parse(xf.sheet_names[1], header=None)
-        hi = next((i for i, r in d.iterrows() if "underlying" in " ".join(str(v) for v in r if pd.notna(v)).lower()), None)
-        if hi is not None:
-            for k in range(hi + 1, len(d)):
-                r = d.iloc[k]
-                if r.dropna().empty: continue
-                vals = list(r.values)
-                mvc = next(c for c, v in d.iloc[hi].items() if isinstance(v, str) and "market value" in v.lower())
-                mvv = tonum(vals[mvc])
-                if mvv is None or pd.isna(vals[1]) or not str(vals[1]).strip(): continue
-                holdings.append(dict(source_file=f"{year}/{month}/{amc_folder}/{fname}", source_sheet=xf.sheet_names[1], source_row=k + 1, record_type="DERIVATIVE_DISCLOSURE",
-                    amc_name=AMC_STD[amc_folder], scheme_name=scheme, amc_scheme_code=code, portfolio_date=portfolio_date,
-                    amc_section_l1="Hedging Positions through Futures", instrument_name_raw=norm(vals[1]), instrument_name=norm(vals[1]),
-                    asset_class="Equity", asset_sub_type="Index Futures" if "nifty" in str(vals[1]).lower() else "Stock Futures", industry=norm(vals[2]),
-                    quantity=tonum(vals[3]), market_value_lakhs=mvv, market_value_inr=round(mvv * 1e5, 2), derivative_position="Long" if (tonum(vals[3]) or 0) >= 0 else "Short",
-                    entry_price=tonum(vals[4]), current_price=tonum(vals[5]), margin_lakhs=tonum(vals[6]), included_in_net_assets=False, is_placed_as_margin=False))
+        # HDFC "Derivative<scheme>" sheet, one or more tables. Columns are mapped from each "Underlying" header:
+        # older files lead with a "Scheme Name" column, newer ones start at "Underlying | Industry | ...".
+        # Futures tables carry a market value; options tables (HDFC Flexi Cap covered calls, Jan/Feb 2024) only a
+        # quantity and the current option price, so their value is quantity x price, booked only when the main
+        # sheet lists no derivatives. ICICI's "Derivative" sheet has prices and margin but no market value: its
+        # contracts are already in the main sheet.
+        sh = xf.sheet_names[1]
+        d = xf.parse(sh, header=None)
+        had_derivatives = has_derivatives()
+        col, section = None, None
+        for k in range(len(d)):
+            r = d.iloc[k]
+            texts = [norm(v).lower() for v in r.values if isinstance(v, str)]
+            first = texts[0] if texts else ""
+            if any(t.startswith("underlying") for t in texts):
+                col = {}
+                for c, v in r.items():
+                    h = norm(v).lower() if isinstance(v, str) else ""
+                    for fld, rx in (("name", r'^underlying'), ("industry", r'^industry'), ("quantity", r'long\s*/\s*\(?short'),
+                                    ("entry_price", r'price when purchased'), ("current_price", r'^current'),
+                                    ("margin", r'margin'), ("market_value", r'market value')):
+                        if fld not in col and re.search(rx, h): col[fld] = c; break
+                is_option = any("option price" in t for t in texts)
+                if "name" not in col or not ("market_value" in col or (is_option and "current_price" in col and not had_derivatives)):
+                    col = None
+                continue
+            if re.match(r'^([a-e]\.\s|total|for the|scheme name)', first):
+                col = None
+                if re.match(r'^[a-e]\.\s', first): section = norm(next(v for v in r.values if isinstance(v, str)))
+                continue
+            if col is None or r.dropna().empty: continue
+            nm = norm(r[col["name"]]) if pd.notna(r[col["name"]]) else ""
+            qty = tonum(r[col["quantity"]]) if "quantity" in col else None
+            if not nm or qty is None: continue
+            if "market_value" in col:
+                mvv = tonum(r[col["market_value"]])
+                sub_type = "Index Futures" if "nifty" in nm.lower() else "Stock Futures"
+            else:
+                price = tonum(r[col["current_price"]])
+                mvv = round(qty * price / 1e5, 6) if price is not None else None
+                sub_type = "Index Options" if re.search(r'nifty|sensex', nm, re.I) else "Stock Options"
+            # stock contracts are already booked from the equity table's Derivative column; keep index contracts
+            if mvv is None or (stock_derivative_rows and sub_type.startswith("Stock")): continue
+            if stock_derivative_rows:
+                nm = re.sub(r'\s*\d{2}-\d{2}-\d{4}.*$', '', nm) or nm  # "Nifty29-02-2024" -> "Nifty", like the stock lines
+            add_derivative(sh, k, section or "Hedging Positions through Futures", nm, sub_type, qty, mvv, None, None,
+                           industry=norm(r[col["industry"]]) if "industry" in col and pd.notna(r[col["industry"]]) else None,
+                           entry_price=tonum(r[col["entry_price"]]) if "entry_price" in col else None,
+                           current_price=tonum(r[col["current_price"]]) if "current_price" in col else None,
+                           margin_lakhs=tonum(r[col["margin"]]) if "margin" in col else None)
     H = pd.DataFrame(holdings)
     deriv = H.asset_sub_type.isin(DERIVATIVE_SUB_TYPES) & H["isin"].isna()
     if deriv.any():
@@ -1202,20 +1497,56 @@ def parse_file(f):
     # store them as 0.01 (-0.01 for short positions) so totals never come out null
     below = H.pct_below_threshold.notna()
     H.loc[below, "pct_to_nav"] = [(-0.01 if (mv or 0) < 0 else 0.01) for mv in H.loc[below, "market_value_lakhs"]]
+    # % to NAV left blank by the AMC: derive from market value / net assets. Covers the Edelweiss Multi Asset
+    # gold line and HDFC's "Derivative..." sheet, which has no % column (the main sheet's "Derivative"
+    # column is this same ratio, rounded, per underlying stock)
+    if grand[0]:
+        blank = H.pct_to_nav.isna() & H.market_value_lakhs.notna()
+        H.loc[blank, "pct_to_nav"] = (H.loc[blank, "market_value_lakhs"] / grand[0] * 100).round(6)
+        # and the reverse for derivative lines printed with a % only (Canara exposure column, Mirae Feb 2024 estimate)
+        no_mv = H.market_value_lakhs.isna() & H.pct_to_nav.notna() & (H.record_type != "HOLDING")
+        H.loc[no_mv, "market_value_lakhs"] = (H.loc[no_mv, "pct_to_nav"] * grand[0] / 100).round(6)
+        H.loc[no_mv, "market_value_inr"] = (H.loc[no_mv, "market_value_lakhs"] * 1e5).round(2)
     ycols = [c for c in ("yield_raw", "ytc_raw") if c in H]
     for c in ycols:
         H[c.replace("_raw", "_pct")] = H[c].map(lambda v: None if v is None or pd.isna(v) else (round(v * 100, 4) if abs(v) < 1 else v))
     # --- futures that the AMC excludes from its grand total (Baroda BNP, DSP)
     mvsum = main.market_value_lakhs.sum(skipna=True)
     if grand[0] is not None:
-        futs = main[main.asset_sub_type.isin(DERIVATIVE_SUB_TYPES) & main.asset_sub_type.str.contains("Futures")]
+        futs = main[is_futures(main)]
+        short_futs = futs[futs.market_value_lakhs < 0]
         if len(futs) and abs(mvsum - grand[0]) > 1 and abs((mvsum - futs.market_value_lakhs.sum()) - grand[0]) < 1:
             H.loc[futs.index, "included_in_net_assets"] = False
+        # Tata Multi Asset: long commodity futures are in the totals, the "^" short hedge legs (stock and commodity) are not
+        elif len(short_futs) and abs(mvsum - grand[0]) > 1 and abs((mvsum - short_futs.market_value_lakhs.sum()) - grand[0]) < 1:
+            H.loc[short_futs.index, "included_in_net_assets"] = False
         # Short equity lines the AMC lists but leaves out of its totals
         # (Tata Large Cap Jan 2025: "INDUSIND BANK LTD^" qty -550000, value -5489)
         shorts = main[(main.asset_class == "Equity") & ~main.asset_sub_type.isin(DERIVATIVE_SUB_TYPES) & (main.market_value_lakhs < 0)]
         if len(shorts) and abs(mvsum - grand[0]) > 1 and abs((mvsum - shorts.market_value_lakhs.sum()) - grand[0]) < 1:
             H.loc[shorts.index, "included_in_net_assets"] = False
+    # AMC printed the Net Receivables label but left the value blank: book the balancing figure
+    # (grand total - instruments), excluding futures when that is what makes the residual smaller
+    if blank_nca is not None and grand[0] is not None:
+        inc_now = H[(H.record_type == "HOLDING") & (H.included_in_net_assets)]
+        res_a = grand[0] - inc_now.market_value_lakhs.sum(skipna=True)
+        fut_idx = inc_now[is_futures(inc_now)].index
+        res_b = res_a + H.loc[fut_idx, "market_value_lakhs"].sum(skipna=True)
+        if len(fut_idx) and abs(res_b) < abs(res_a):
+            H.loc[fut_idx, "included_in_net_assets"] = False
+            res_a = res_b
+        if abs(res_a) >= 0.01:
+            r0, nm0, sp0 = blank_nca
+            nca = {c: None for c in H.columns}
+            nca.update(source_file=f"{year}/{month}/{amc_folder}/{fname}", source_sheet=sheet, source_row=r0 + 1, record_type="HOLDING",
+                       amc_name=AMC_STD[amc_folder], scheme_name=scheme, amc_scheme_code=code, portfolio_date=portfolio_date,
+                       amc_section_l1=sp0[0] if sp0 else None, amc_section_l2=sp0[1] if len(sp0) > 1 else None,
+                       instrument_name_raw=nm0, instrument_name=nm0, asset_class="Cash and Cash Equivalents", asset_sub_type="Net Receivables / (Payables)",
+                       market_value_lakhs=round(res_a, 6), market_value_inr=round(res_a * 1e5, 2), pct_to_nav=round(res_a / grand[0] * 100, 6),
+                       included_in_net_assets=True, is_placed_as_margin=False,
+                       footnote_symbols="value blank in source; derived as grand total minus listed instruments")
+            H = pd.concat([H, pd.DataFrame([nca])], ignore_index=True)
+    H = merge_duplicate_isins(H)
     inc = H[(H.record_type == "HOLDING") & (H.included_in_net_assets)]
     snap = dict(source_file=f"{year}/{month}/{amc_folder}/{fname}", source_sheet=sheet, amc_name=AMC_STD[amc_folder], scheme_name=scheme, amc_scheme_code=code,
                 portfolio_date=portfolio_date, reported_date_text=reported_date, header_row=hdr + 1, pct_scale_in_source="fraction (0-1)" if frac else "percent (0-100)",
@@ -1242,7 +1573,6 @@ MONTH_NAME = {
     12: "december",
 }
 
-
 def get_fund_category(scheme_name, source_file):
     """
     Derive the API schema category from the mutual fund scheme.
@@ -1261,7 +1591,7 @@ def get_fund_category(scheme_name, source_file):
         (r"\blarge\s*cap\b", "Large Cap"),
         (r"\bmid[\s-]*cap\b", "Mid Cap"),
         (r"\bsmall\s*cap\b", "Small Cap"),
-        (r"\bflexi\s+cap\b", "Flexi Cap"),
+        (r"\bflexi\s*cap\b", "Flexi Cap"),
         (r"\bmulti\s+asset\b", "Multi Asset"),
         (r"\bvalue\b", "Value"),
         # (r"\belss\b", "ELSS"),
@@ -1322,11 +1652,22 @@ def collapse_aggregate_holdings(holdings):
 
     kept = []
     totals = {}
+    seen_isin = {}
 
     for holding in holdings:
         asset_class = holding.get("asset_class")
 
         if asset_class not in AGGREGATE_ASSET_CLASSES:
+            # Neo4j has a unique-ISIN constraint per snapshot: fold any repeat
+            # ISIN in the fund-month (e.g. the same scheme filed twice) into one row
+            isin = holding.get("isin")
+            if isin and isin in seen_isin:
+                prev = seen_isin[isin]
+                if holding.get("holdings") is not None:
+                    prev["holdings"] = round((prev.get("holdings") or 0) + holding["holdings"], 6)
+                continue
+            if isin:
+                seen_isin[isin] = holding
             kept.append(holding)
             continue
 
@@ -1382,6 +1723,13 @@ def save_holdings_json(df, output_file):
     """
 
     result = {}
+
+    # a hedge leg the AMC leaves out of net assets must not collide with the
+    # held position of the same ISIN in Neo4j: keep only the included row
+    if "included_in_net_assets" in df:
+        inc_flag = df.included_in_net_assets.astype(str).str.lower().isin(["true", "1"])
+        clash = df["isin"].notna() & df.duplicated(["source_file", "isin"], keep=False)
+        df = df[~(clash & ~inc_flag)]
 
     for _, row in df.iterrows():
 
@@ -1526,6 +1874,8 @@ def save_holdings_json(df, output_file):
 
             "equityType": None,
 
+            "commodityType": None,
+
             "symbol": clean_json_value(
                 row.get("symbol")
             ),
@@ -1556,6 +1906,10 @@ def save_holdings_json(df, output_file):
 
             else:
                 holding["equityType"] = "Domestic Equity"
+
+        # Physical / Derivative
+        elif asset_class == "Commodities":
+            holding["commodityType"] = asset_sub_type
 
         # ---------------------------------------------------------
         # ADD HOLDING

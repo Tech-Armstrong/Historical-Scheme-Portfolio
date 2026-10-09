@@ -126,3 +126,32 @@ HSBC Mutual Fund,HSBC VALUE FUND,151110,HSBC Value Fund,HSBC Value Fund - Regula
 HSBC Mutual Fund,HSBC FOCUSED FUND,148409,HSBC Focused Fund,HSBC Focused Fund - Regular Growth,HSBC,FOCUSED,direct,,True
 HSBC Mutual Fund,HSBC BUSINESS CYCLES FUND,151144,HSBC Business Cycles Fund,HSBC Business Cycles Fund - Regular Growth,HSBC,THEMATIC BUSINESS CYCLE,direct,,True
 ,HSBC BUSINESS CYCLE FUND,151144,HSBC Business Cycles Fund,HSBC Business Cycles Fund - Regular Growth,HSBC,THEMATIC BUSINESS CYCLE,variant,,False
+SBI Mutual Fund,SBI LARGE CAP FUND,103504,SBI Large Cap Fund,SBI Large Cap Fund - Regular Growth,SBI,LARGE CAP,direct,,True
+,SBI BLUE CHIP FUND,103504,SBI Large Cap Fund,SBI Large Cap Fund - Regular Growth,SBI,LARGE CAP,renamed,Renamed: SBI Blue Chip Fund -> SBI Large Cap Fund,True
+,SBI BLUECHIP FUND,103504,SBI Large Cap Fund,SBI Large Cap Fund - Regular Growth,SBI,LARGE CAP,variant,,False
+SBI Mutual Fund,SBI MIDCAP FUND,102941,SBI Midcap Fund,SBI Midcap Fund - Regular - Growth,SBI,MID CAP,direct,,True
+,SBI MAGNUM MIDCAP FUND,102941,SBI Midcap Fund,SBI Midcap Fund - Regular - Growth,SBI,MID CAP,renamed,Renamed: SBI Magnum Midcap Fund -> SBI Midcap Fund,True
+,SBI MID CAP FUND,102941,SBI Midcap Fund,SBI Midcap Fund - Regular - Growth,SBI,MID CAP,variant,,False
+SBI Mutual Fund,SBI SMALL CAP FUND,125494,SBI Small Cap Fund,SBI Small Cap Fund - Regular - Growth,SBI,SMALL CAP,direct,,False
+,SBI SMALLCAP FUND,125494,SBI Small Cap Fund,SBI Small Cap Fund - Regular - Growth,SBI,SMALL CAP,variant,,True
+SBI Mutual Fund,SBI FOCUSED FUND,102756,SBI Focused Fund,SBI Focused Fund - Regular - Growth,SBI,FOCUSED,direct,,True
+,SBI FOCUSED EQUITY FUND,102756,SBI Focused Fund,SBI Focused Fund - Regular - Growth,SBI,FOCUSED,renamed,Renamed: SBI Focused Equity Fund -> SBI Focused Fund,True
+PPFAS Mutual Fund,PARAG PARIKH FLEXI CAP FUND,122640,Parag Parikh Flexi Cap Fund,Parag Parikh Flexi Cap Fund - Regular - Growth,PPFAS,FLEXI CAP,direct,,True
+Kotak Mahindra Mutual Fund,KOTAK LARGE CAP FUND,114458,Kotak Large Cap Fund,Kotak Large Cap Fund - Growth,Kotak Mahindra,LARGE CAP,direct,,False
+,KOTAK BLUECHIP FUND,114458,Kotak Large Cap Fund,Kotak Large Cap Fund - Growth,Kotak Mahindra,LARGE CAP,renamed,Renamed: Kotak Bluechip Fund -> Kotak Large Cap Fund,True
+Kotak Mahindra Mutual Fund,KOTAK MIDCAP FUND,104908,Kotak Midcap Fund,Kotak Midcap Fund - Regular - Growth,Kotak Mahindra,MID CAP,direct,,False
+,KOTAK EMERGING EQUITY FUND,104908,Kotak Midcap Fund,Kotak Midcap Fund - Regular - Growth,Kotak Mahindra,MID CAP,renamed,Renamed: Kotak Emerging Equity Fund -> Kotak Midcap Fund,True
+,KOTAK MID CAP FUND,104908,Kotak Midcap Fund,Kotak Midcap Fund - Regular - Growth,Kotak Mahindra,MID CAP,variant,,False
+Kotak Mahindra Mutual Fund,KOTAK SMALL CAP FUND,102875,Kotak Small Cap Fund,Kotak Small Cap Fund - Growth,Kotak Mahindra,SMALL CAP,direct,,True
+Kotak Mahindra Mutual Fund,KOTAK FOCUSED FUND,147477,Kotak Focused Fund,Kotak Focused Fund - Regular - Growth,Kotak Mahindra,FOCUSED,direct,,False
+,KOTAK FOCUSED EQUITY FUND,147477,Kotak Focused Fund,Kotak Focused Fund - Regular - Growth,Kotak Mahindra,FOCUSED,renamed,Renamed: Kotak Focused Equity Fund -> Kotak Focused Fund,True
+Kotak Mahindra Mutual Fund,KOTAK FLEXICAP FUND,112090,Kotak Flexicap Fund,Kotak Flexicap Fund - Growth,Kotak Mahindra,FLEXI CAP,direct,,True
+,KOTAK FLEXI CAP FUND,112090,Kotak Flexicap Fund,Kotak Flexicap Fund - Growth,Kotak Mahindra,FLEXI CAP,variant,,False
+Kotak Mahindra Mutual Fund,KOTAK BALANCED ADVANTAGE FUND,144333,Kotak Balanced Advantage Fund,Kotak Balanced Advantage Fund - Regular Plan - Growth Option,Kotak Mahindra,BALANCED ADVANTAGE,direct,,True
+Kotak Mahindra Mutual Fund,KOTAK MULTI ASSET ALLOCATION FUND,152065,Kotak Multi Asset Allocation Fund,Kotak Multi Asset Allocation Fund - Regular - Growth,Kotak Mahindra,MULTI ASSET ALLOCATION,direct,,True
+,KOTAK MULTI ASSET FUND,152065,Kotak Multi Asset Allocation Fund,Kotak Multi Asset Allocation Fund - Regular - Growth,Kotak Mahindra,MULTI ASSET ALLOCATION,variant,,False
+Kotak Mahindra Mutual Fund,KOTAK BUSINESS CYCLE FUND,150626,Kotak Business Cycle Fund,Kotak Business Cycle Fund - Regular - Growth,Kotak Mahindra,THEMATIC BUSINESS CYCLE,direct,,True
+SBI Mutual Fund,SBI BALANCED ADVANTAGE FUND,149132,SBI Balanced Advantage Fund,SBI Balanced Advantage Fund - Regular Plan - Growth,SBI,BALANCED ADVANTAGE,direct,,True
+SBI Mutual Fund,SBI FLEXICAP FUND,103215,SBI Flexicap Fund,SBI Flexicap Fund - Regular - Growth,SBI,FLEXI CAP,direct,,True
+,SBI FLEXI CAP FUND,103215,SBI Flexicap Fund,SBI Flexicap Fund - Regular - Growth,SBI,FLEXI CAP,variant,,False
+SBI Mutual Fund,SBI MULTI ASSET ALLOCATION FUND,103408,SBI Multi Asset Allocation Fund,SBI Multi Asset Allocation Fund - Regular - Growth,SBI,MULTI ASSET ALLOCATION,direct,,True
